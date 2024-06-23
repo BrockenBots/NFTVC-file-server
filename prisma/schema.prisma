@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  password  String   @db.VarChar(64)
+  fio       String   @db.VarChar(64)
+  email     String   @unique @db.VarChar(64)
+  city      String   @db.VarChar(64)
+  community String   @db.VarChar(128)
+  room      Int?     
+  refresh   String?   @db.VarChar(256)
+  profileImage String?
+  events EventUser[]
+  topics Topic[]
+
+  @@unique([id, fio])
+}
+
+model Event {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(64)
+  description String @db.VarChar(256)
+  date DateTime @db.Timestamptz
+  count Int? 
+  ready Int
+  eventImage String?
+  users EventUser[]
+}
+
+model Topic {
+    id Int @id @default(autoincrement())
+    name String
+    updatedAt DateTime @db.Timestamptz @updatedAt
+    category String
+    room String @unique
+    usersCount Int
+    messagesCount Int
+    users User[]
+}
+
+model EventUser {
+  id Int @id @default(autoincrement())
+  event Event @relation(fields: [eventId], references: [id])
+  eventId Int
+  
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Ad {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  photos String[]
+  createdAt DateTime @db.Timestamptz @default(now())
+  contactData String
+  category String
+  room String @unique
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+  text String
+  userId Int
+  userName String
+  createdAt DateTime @db.Timestamptz @default(now())
+  room Room @relation(fields: [roomId], references: [roomId])
+  roomId String
+}
+
+model Room {
+  id Int @id @default(autoincrement())
+  messages Message[]
+  roomId String @unique
+}
