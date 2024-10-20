@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  nftvc-file-server:
+    container_name: file-server
+    ports:
+      - 2999:2999
+    env_file: '.env'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - app_network
+
+networks:
+  app_network:
